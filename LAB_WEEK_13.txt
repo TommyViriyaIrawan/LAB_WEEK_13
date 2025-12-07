@@ -1,0 +1,31 @@
+ASSIGNMENT ANSWERS - LAB_WEEK_13
+
+1. Why is MVVM important? Which files represent Model, which files represent View, and which files represent ViewModel?
+MVVM separates UI logic from data logic so the code is easier to maintain, test, and reuse.
+- Model: classes that represent and manage data.
+  • Movie.kt (entity + API model)
+  • MovieDao.kt, MovieDatabase.kt (Room data access)
+  • MovieRepository.kt (data/source layer that talks to API and Room)
+- View: everything that displays data to the user.
+  • activity_main.xml, view_movie_item.xml
+  • MainActivity.kt, DetailsActivity.kt
+  • MovieAdapter.kt (RecyclerView adapter)
+- ViewModel: classes that prepare data for the View and survive configuration changes.
+  • MovieViewModel.kt
+  • DetailsViewModel.kt
+
+2. In Part 1, you implemented Data Binding, why is this more efficient than using the normal method?
+With Data Binding, the View can observe data directly from the ViewModel. We don’t need to call findViewById or manually update the RecyclerView every time the data changes. When popularMovies is updated, the binding automatically calls the @BindingAdapter("list") function and refreshes the UI. This reduces boilerplate code, avoids bugs from forgetting to update the UI, and keeps the View logic simpler and more declarative.
+
+3. In Part 2, you implemented the Singleton Pattern, why is this important?
+The MovieDatabase uses the Singleton Pattern so there is only one instance of the Room database in the whole app. Creating a database is expensive, so reusing one instance saves memory and time. The @Volatile field and synchronized block also prevent race conditions when multiple threads try to access the database. This makes data access safer and more consistent.
+
+4. In Part 2 & 3, you implemented the Repository Pattern, why is this important?
+The Repository Pattern hides where the data actually comes from (network or local database). The ViewModel only talks to MovieRepository, not directly to Retrofit or Room. This gives several benefits:
+- We can easily switch or combine data sources (API + Room cache).
+- The ViewModel becomes simpler and easier to test.
+- There is a clear single source of truth for movie data.
+- All data-related logic (caching, error handling, refresh) is centralized in one place.
+
+5. In part 3, you implemented the Worker Manager, is there another way to refresh your database with the latest data other than using Worker?
+Yes. For example, we could refresh data manually whenever the user opens the app, pulls to refresh, or when the app comes to the foreground (using coroutines or timers). We could also use other background mechanisms like AlarmManager plus a Service or push notifications to trigger a refresh. However, WorkManager is recommended because it is lifecycle-aware, respects system constraints (network, battery), and can run periodically even if the app is closed or the device restarts.
