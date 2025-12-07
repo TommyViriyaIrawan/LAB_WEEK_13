@@ -1,7 +1,7 @@
 package com.example.lab_week_13
 
 import android.app.Application
-import com.squareup.moshi.Moshi
+import com.example.lab_week_13.database.MovieDatabase
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
@@ -12,15 +12,18 @@ class MovieApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        val moshi = Moshi.Builder().build()
-
+        // Retrofit
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.themoviedb.org/3/")
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addConverterFactory(MoshiConverterFactory.create())
             .build()
 
         val movieService = retrofit.create(MovieService::class.java)
 
-        movieRepository = MovieRepository(movieService)
+        // ⬇️ Step 9: buat instance MovieDatabase
+        val movieDatabase = MovieDatabase.getInstance(applicationContext)
+
+        // ⬇️ Step 9: pass movieDatabase ke repository
+        movieRepository = MovieRepository(movieService, movieDatabase)
     }
 }
